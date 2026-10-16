@@ -53,6 +53,6 @@ runs:
       shell: bash
       env:
         TILLER_VERSION: ${{ inputs.version }}
-        TILLER_NAME_PREFIX: ${{ inputs.name-prefix }}
+        TILLER_NAME_PREFIX: ${{ inputs['name-prefix'] }}
         TILLER_RUN_ID: ${{ github.run_id }}
       run: bash "$GITHUB_ACTION_PATH/scripts/version.sh"

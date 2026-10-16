@@ -37,8 +37,8 @@ runs:
         CNB_TAG: ${{ inputs.tag }}
         CNB_COMMIT: ${{ inputs.commit }}
         CNB_NAME: ${{ inputs.name }}
-        CNB_BODY_FILE: ${{ inputs.body-file }}
+        CNB_BODY_FILE: ${{ inputs['body-file'] }}
         CNB_FILES: ${{ inputs.files }}
         CNB_PRERELEASE: ${{ inputs.prerelease }}
-        CNB_MAKE_LATEST: ${{ inputs.make-latest }}
+        CNB_MAKE_LATEST: ${{ inputs['make-latest'] }}
       run: bash "$GITHUB_ACTION_PATH/../scripts/publish-cnb.sh"

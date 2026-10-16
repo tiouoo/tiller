@@ -52,10 +52,10 @@ jobs:
         uses: tiouoo/tiller@v1
         with:
           version: ${{ inputs.version }}
-          name-prefix: "${{ inputs.release-name-prefix }} "
+          name-prefix: "${{ inputs['release-name-prefix'] }} "
       - uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: ${{ inputs.dotnet-version }}
+          dotnet-version: ${{ inputs['dotnet-version'] }}
       - name: Authenticate to NuGet.org
         id: nuget-login
         uses: NuGet/login@v1
@@ -64,7 +64,7 @@ jobs:
       - name: Pack NuGet packages
         env:
           VERSION: ${{ steps.meta.outputs.version }}
-        run: bash "${{ inputs.pack-script }}"
+        run: bash "${{ inputs['pack-script'] }}"
       - name: Publish NuGet packages
         run: dotnet nuget push "artifacts/*.nupkg" --api-key "${{ steps.nuget-login.outputs.NUGET_API_KEY }}" --source https://api.nuget.org/v3/index.json --skip-duplicate
       - name: Create and push tag
@@ -85,11 +85,11 @@ jobs:
           compgen -G 'artifacts/*.snupkg' >/dev/null && files+=(artifacts/*.snupkg)
           gh release create "$TAG" "${files[@]}" --title "$NAME" --generate-notes
       - name: Sync CNB release
-        if: inputs.cnb-repository != ''
+        if: inputs['cnb-repository'] != ''
         uses: tiouoo/tiller/cnb@v1
         with:
           token: ${{ secrets.CNB_TOKEN }}
-          repository: ${{ inputs.cnb-repository }}
+          repository: ${{ inputs['cnb-repository'] }}
           tag: ${{ steps.meta.outputs.tag }}
           commit: ${{ github.sha }}
           name: ${{ steps.meta.outputs.release_name }}
@@ -97,11 +97,11 @@ jobs:
             artifacts/*.nupkg
             artifacts/*.snupkg
       - name: Sync GitCode release
-        if: inputs.gitcode-repository != ''
+        if: inputs['gitcode-repository'] != ''
         uses: tiouoo/tiller/gitcode@v1
         with:
           token: ${{ secrets.GITCODE_TOKEN }}
-          repository: ${{ inputs.gitcode-repository }}
+          repository: ${{ inputs['gitcode-repository'] }}
           tag: ${{ steps.meta.outputs.tag }}
           commit: ${{ github.sha }}
           name: ${{ steps.meta.outputs.release_name }}

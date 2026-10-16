@@ -33,7 +33,7 @@ runs:
         GITCODE_TAG: ${{ inputs.tag }}
         GITCODE_COMMIT: ${{ inputs.commit }}
         GITCODE_NAME: ${{ inputs.name }}
-        GITCODE_BODY_FILE: ${{ inputs.body-file }}
+        GITCODE_BODY_FILE: ${{ inputs['body-file'] }}
         GITCODE_PRERELEASE: ${{ inputs.prerelease }}
-        GITCODE_SKIP_TAG_PUSH: ${{ inputs.skip-tag-push }}
+        GITCODE_SKIP_TAG_PUSH: ${{ inputs['skip-tag-push'] }}
       run: bash "$GITHUB_ACTION_PATH/../scripts/publish-gitcode.sh"

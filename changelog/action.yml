@@ -18,7 +18,7 @@ runs:
     - shell: bash
       env:
         TILLER_CHANGELOG_OUTPUT: ${{ inputs.output }}
-        TILLER_EMPTY_MESSAGE: ${{ inputs.empty-message }}
+        TILLER_EMPTY_MESSAGE: ${{ inputs['empty-message'] }}
         TILLER_REPO_URL: ${{ github.server_url }}/${{ github.repository }}
         TILLER_SHA: ${{ github.sha }}
       run: bash "$GITHUB_ACTION_PATH/../scripts/changelog.sh"

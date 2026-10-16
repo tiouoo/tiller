@@ -33,7 +33,7 @@ runs:
       shell: bash
       env:
         TILLER_BUILD_KIND: ${{ inputs.kind }}
-        TILLER_BASE_VERSION_FILE: ${{ inputs.base-version-file }}
+        TILLER_BASE_VERSION_FILE: ${{ inputs['base-version-file'] }}
         TILLER_BUILD_EPOCH: ${{ inputs.epoch }}
         TILLER_RUN_ID: ${{ github.run_id }}
       run: bash "$GITHUB_ACTION_PATH/../scripts/build-metadata.sh"
