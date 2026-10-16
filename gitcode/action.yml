@@ -1,0 +1,39 @@
+name: Tiller GitCode release sync
+description: Synchronize a tag and release notes to GitCode.
+inputs:
+  token:
+    required: false
+    description: GitCode access token; an empty token skips synchronization.
+  repository:
+    required: true
+  tag:
+    required: true
+  commit:
+    required: false
+    default: ""
+  name:
+    required: false
+    default: ""
+  body-file:
+    required: false
+    default: ""
+  prerelease:
+    required: false
+    default: "false"
+  skip-tag-push:
+    required: false
+    default: "false"
+runs:
+  using: composite
+  steps:
+    - shell: bash
+      env:
+        GITCODE_TOKEN: ${{ inputs.token }}
+        GITCODE_REPO: ${{ inputs.repository }}
+        GITCODE_TAG: ${{ inputs.tag }}
+        GITCODE_COMMIT: ${{ inputs.commit }}
+        GITCODE_NAME: ${{ inputs.name }}
+        GITCODE_BODY_FILE: ${{ inputs.body-file }}
+        GITCODE_PRERELEASE: ${{ inputs.prerelease }}
+        GITCODE_SKIP_TAG_PUSH: ${{ inputs.skip-tag-push }}
+      run: bash "$GITHUB_ACTION_PATH/../scripts/publish-gitcode.sh"

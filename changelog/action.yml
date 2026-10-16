@@ -1,0 +1,24 @@
+name: Tiller changelog
+description: Generate a Markdown changelog from the latest stable tag.
+inputs:
+  output:
+    description: Output Markdown file.
+    required: false
+    default: RELEASE_CHANGELOG.md
+  empty-message:
+    description: Text written when the selected range has no commits.
+    required: false
+    default: No changes since the previous stable release.
+outputs:
+  file:
+    value: ${{ inputs.output }}
+runs:
+  using: composite
+  steps:
+    - shell: bash
+      env:
+        TILLER_CHANGELOG_OUTPUT: ${{ inputs.output }}
+        TILLER_EMPTY_MESSAGE: ${{ inputs.empty-message }}
+        TILLER_REPO_URL: ${{ github.server_url }}/${{ github.repository }}
+        TILLER_SHA: ${{ github.sha }}
+      run: bash "$GITHUB_ACTION_PATH/../scripts/changelog.sh"
