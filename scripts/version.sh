@@ -44,18 +44,8 @@ release_date="$(TZ='Asia/Shanghai' date '+%Y-%m-%d %H:%M:%S')"
 release_name="${TILLER_NAME_PREFIX:-v}${version}"
 run_id="${TILLER_RUN_ID:-}"
 
-json="$(python3 - "$build_time" "$run_id" "$commit" "$version" "$release_name" <<'PY'
-import json, sys
-print(json.dumps({
-    "type": "release",
-    "build-time": sys.argv[1],
-    "action": sys.argv[2],
-    "commit": sys.argv[3],
-    "version": sys.argv[4],
-    "version_title": sys.argv[5],
-}, ensure_ascii=False, separators=(",", ":")))
-PY
-)"
+json="$(node -e 'process.stdout.write(JSON.stringify({type:"release","build-time":process.argv[1],action:process.argv[2],commit:process.argv[3],version:process.argv[4],version_title:process.argv[5]}))' \
+  "$build_time" "$run_id" "$commit" "$version" "$release_name")"
 
 {
   echo "version=${version}"

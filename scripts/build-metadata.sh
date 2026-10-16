@@ -20,19 +20,8 @@ commit="$(git rev-parse --short=6 HEAD)"
 build_time="$(TZ='Asia/Shanghai' date -Iseconds)"
 timestamp="$(TZ='Asia/Shanghai' date +'%Y%m%d%H%M')"
 title="build-${kind}-${app_version}-${TILLER_RUN_ID:-}-${commit}"
-json="$(python3 - "$kind" "$build_time" "${TILLER_RUN_ID:-}" "$commit" "$base_version" "$timestamp" "$title" <<'PY'
-import json, sys
-print(json.dumps({
-    "type": sys.argv[1],
-    "build-time": sys.argv[2],
-    "action": sys.argv[3],
-    "commit": sys.argv[4],
-    "version": sys.argv[5],
-    "timestamp": sys.argv[6],
-    "version_title": sys.argv[7],
-}, ensure_ascii=False, separators=(",", ":")))
-PY
-)"
+json="$(node -e 'process.stdout.write(JSON.stringify({type:process.argv[1],"build-time":process.argv[2],action:process.argv[3],commit:process.argv[4],version:process.argv[5],timestamp:process.argv[6],version_title:process.argv[7]}))' \
+  "$kind" "$build_time" "${TILLER_RUN_ID:-}" "$commit" "$base_version" "$timestamp" "$title")"
 {
   echo "json=${json}"
   echo "app_version=${app_version}"

@@ -19,6 +19,12 @@ outputs:
   previous_tag:
     description: Previous stable version tag, when present.
     value: ${{ steps.meta.outputs.previous_tag }}
+  prev_tag:
+    description: Alias of previous_tag.
+    value: ${{ steps.meta.outputs.previous_tag }}
+  app_version:
+    description: Alias of version.
+    value: ${{ steps.meta.outputs.version }}
   commit:
     description: Seven-character commit hash.
     value: ${{ steps.meta.outputs.commit }}
