@@ -1,0 +1,20 @@
+name: Tiller NuGet push
+description: Push pre-built NuGet packages to a package source.
+inputs:
+  api-key:
+    required: true
+  packages:
+    required: false
+    default: artifacts/*.nupkg
+  source:
+    required: false
+    default: https://api.nuget.org/v3/index.json
+runs:
+  using: composite
+  steps:
+    - shell: bash
+      env:
+        TILLER_NUGET_API_KEY: ${{ inputs['api-key'] }}
+        TILLER_NUGET_PACKAGES: ${{ inputs.packages }}
+        TILLER_NUGET_SOURCE: ${{ inputs.source }}
+      run: dotnet nuget push "$TILLER_NUGET_PACKAGES" --api-key "$TILLER_NUGET_API_KEY" --source "$TILLER_NUGET_SOURCE" --skip-duplicate

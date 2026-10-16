@@ -1,17 +1,12 @@
-name: Tiller CNB release sync
-description: Synchronize a tag, release notes, and optional assets to CNB.
+name: Tiller CNB release
+description: Create or replace one CNB Release for an existing tag.
 inputs:
   token:
     required: false
-    description: CNB access token; an empty token skips synchronization.
   repository:
     required: true
-    description: CNB repository in owner/name form.
   tag:
     required: true
-  commit:
-    required: false
-    default: ""
   name:
     required: false
     default: ""
@@ -35,10 +30,9 @@ runs:
         CNB_TOKEN: ${{ inputs.token }}
         CNB_REPO: ${{ inputs.repository }}
         CNB_TAG: ${{ inputs.tag }}
-        CNB_COMMIT: ${{ inputs.commit }}
         CNB_NAME: ${{ inputs.name }}
         CNB_BODY_FILE: ${{ inputs['body-file'] }}
         CNB_FILES: ${{ inputs.files }}
         CNB_PRERELEASE: ${{ inputs.prerelease }}
         CNB_MAKE_LATEST: ${{ inputs['make-latest'] }}
-      run: bash "$GITHUB_ACTION_PATH/../scripts/publish-cnb.sh"
+      run: bash "$GITHUB_ACTION_PATH/../scripts/cnb-release.sh"

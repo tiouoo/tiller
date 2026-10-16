@@ -1,0 +1,17 @@
+name: Tiller rolling version
+description: Calculate a 0.days.hours.minutes version from a fixed epoch.
+inputs:
+  epoch:
+    description: Asia/Shanghai timestamp used as day zero.
+    required: true
+outputs:
+  version:
+    value: ${{ steps.version.outputs.version }}
+runs:
+  using: composite
+  steps:
+    - id: version
+      shell: bash
+      env:
+        TILLER_EPOCH: ${{ inputs.epoch }}
+      run: bash "$GITHUB_ACTION_PATH/../scripts/rolling-version.sh"

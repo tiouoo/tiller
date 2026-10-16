@@ -1,0 +1,22 @@
+name: Tiller CNB tag
+description: Push one tag to a CNB repository.
+inputs:
+  token:
+    required: false
+  repository:
+    required: true
+  tag:
+    required: true
+  commit:
+    required: false
+    default: ""
+runs:
+  using: composite
+  steps:
+    - shell: bash
+      env:
+        CNB_TOKEN: ${{ inputs.token }}
+        CNB_REPO: ${{ inputs.repository }}
+        CNB_TAG: ${{ inputs.tag }}
+        CNB_COMMIT: ${{ inputs.commit }}
+      run: bash "$GITHUB_ACTION_PATH/../scripts/cnb-tag.sh"

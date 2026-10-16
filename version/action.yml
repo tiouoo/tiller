@@ -1,0 +1,22 @@
+name: Tiller version
+description: Calculate the next stable version from vX.Y.Z tags.
+inputs:
+  version:
+    description: Optional explicit X.Y.Z version.
+    required: false
+    default: ""
+outputs:
+  version:
+    value: ${{ steps.version.outputs.version }}
+  tag:
+    value: ${{ steps.version.outputs.tag }}
+  previous-tag:
+    value: ${{ steps.version.outputs.previous_tag }}
+runs:
+  using: composite
+  steps:
+    - id: version
+      shell: bash
+      env:
+        TILLER_VERSION: ${{ inputs.version }}
+      run: bash "$GITHUB_ACTION_PATH/../scripts/version.sh"

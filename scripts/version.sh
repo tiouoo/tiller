@@ -26,7 +26,7 @@ if ! [[ "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
   exit 1
 fi
 
-IFS=. read -r major minor patch <<< "$version"
+IFS=. read -r _ _ patch <<< "$version"
 if [ "$patch" -gt 9 ]; then
   echo "Tiller: patch must be between 0 and 9" >&2
   exit 1
@@ -38,22 +38,8 @@ if git rev-parse -q --verify "refs/tags/${tag}" >/dev/null; then
   exit 1
 fi
 
-commit="$(git rev-parse --short=7 HEAD)"
-build_time="$(TZ='Asia/Shanghai' date -Iseconds)"
-release_date="$(TZ='Asia/Shanghai' date '+%Y-%m-%d %H:%M:%S')"
-release_name="${TILLER_NAME_PREFIX:-v}${version}"
-run_id="${TILLER_RUN_ID:-}"
-
-json="$(node -e 'process.stdout.write(JSON.stringify({type:"release","build-time":process.argv[1],action:process.argv[2],commit:process.argv[3],version:process.argv[4],version_title:process.argv[5]}))' \
-  "$build_time" "$run_id" "$commit" "$version" "$release_name")"
-
 {
   echo "version=${version}"
   echo "tag=${tag}"
   echo "previous_tag=${previous_tag}"
-  echo "commit=${commit}"
-  echo "build_time=${build_time}"
-  echo "release_date=${release_date}"
-  echo "release_name=${release_name}"
-  echo "json=${json}"
 } >> "$output_file"

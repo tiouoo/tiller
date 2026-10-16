@@ -1,0 +1,22 @@
+name: Tiller GitCode tag
+description: Push one tag to a GitCode repository.
+inputs:
+  token:
+    required: false
+  repository:
+    required: true
+  tag:
+    required: true
+  commit:
+    required: false
+    default: ""
+runs:
+  using: composite
+  steps:
+    - shell: bash
+      env:
+        GITCODE_TOKEN: ${{ inputs.token }}
+        GITCODE_REPO: ${{ inputs.repository }}
+        GITCODE_TAG: ${{ inputs.tag }}
+        GITCODE_COMMIT: ${{ inputs.commit }}
+      run: bash "$GITHUB_ACTION_PATH/../scripts/gitcode-tag.sh"
