@@ -5,6 +5,10 @@ inputs:
     description: Optional explicit X.Y.Z version.
     required: false
     default: ""
+  minor-limit:
+    description: Carry minor into major above this value; 0 keeps minor unbounded.
+    required: false
+    default: "0"
 outputs:
   version:
     value: ${{ steps.version.outputs.version }}
@@ -19,4 +23,5 @@ runs:
       shell: bash
       env:
         TILLER_VERSION: ${{ inputs.version }}
+        TILLER_MINOR_LIMIT: ${{ inputs['minor-limit'] }}
       run: bash "$GITHUB_ACTION_PATH/../scripts/version.sh"

@@ -1,6 +1,18 @@
 name: Tiller changelog
-description: Generate a Markdown changelog from the latest stable tag.
+description: Generate a Markdown changelog between explicit refs or the latest stable tag.
 inputs:
+  base-ref:
+    description: Base ref, auto for the latest stable tag, or none for initial history.
+    required: false
+    default: auto
+  head-ref:
+    description: Commit to describe, independent of the current checkout.
+    required: false
+    default: HEAD
+  initial-history:
+    description: Use recent (20 commits) or all when there is no base ref.
+    required: false
+    default: recent
   output:
     description: Output Markdown file.
     required: false
@@ -21,4 +33,7 @@ runs:
         TILLER_EMPTY_MESSAGE: ${{ inputs['empty-message'] }}
         TILLER_REPO_URL: ${{ github.server_url }}/${{ github.repository }}
         TILLER_SHA: ${{ github.sha }}
+        TILLER_BASE_REF: ${{ inputs['base-ref'] }}
+        TILLER_HEAD_REF: ${{ inputs['head-ref'] }}
+        TILLER_INITIAL_HISTORY: ${{ inputs['initial-history'] }}
       run: bash "$GITHUB_ACTION_PATH/../scripts/changelog.sh"

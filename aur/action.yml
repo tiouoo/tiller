@@ -1,0 +1,73 @@
+name: Tiller AUR
+description: Validate and publish one already-rendered AUR package directory. Requires Arch Linux and makepkg.
+inputs:
+  package-directory:
+    required: true
+    description: Directory containing PKGBUILD and any local package sources.
+  package-name:
+    required: true
+  ssh-private-key:
+    required: true
+  username:
+    required: true
+  email:
+    required: false
+    default: actions@github.com
+  commit-message:
+    required: true
+runs:
+  using: composite
+  steps:
+    - shell: bash
+      env:
+        TILLER_AUR_DIRECTORY: ${{ inputs['package-directory'] }}
+        TILLER_AUR_PACKAGE: ${{ inputs['package-name'] }}
+        TILLER_AUR_KEY: ${{ inputs['ssh-private-key'] }}
+        TILLER_AUR_USERNAME: ${{ inputs.username }}
+        TILLER_AUR_EMAIL: ${{ inputs.email }}
+        TILLER_AUR_MESSAGE: ${{ inputs['commit-message'] }}
+      run: |
+        
+        package="${TILLER_AUR_PACKAGE:?package-name is required}"
+        [[ "$package" =~ ^[a-z0-9][a-z0-9+_.-]*$ ]] || { echo 'Tiller: invalid AUR package name' >&2; exit 1; }
+        source_dir="$(cd "${TILLER_AUR_DIRECTORY:?package-directory is required}" && pwd)"
+        test -f "$source_dir/PKGBUILD"
+        work="$(mktemp -d)"
+        trap 'rm -rf "$work"' EXIT
+        chmod 755 "$work"
+        printf '%s\n' "${TILLER_AUR_KEY:?ssh-private-key is required}" > "$work/key"
+        chmod 600 "$work/key"
+        ssh-keyscan -t ed25519 aur.archlinux.org > "$work/known_hosts"
+        export GIT_SSH_COMMAND="ssh -4 -i '$work/key' -o IdentitiesOnly=yes -o StrictHostKeyChecking=yes -o UserKnownHostsFile='$work/known_hosts'"
+        git clone "ssh://aur@aur.archlinux.org/${package}.git" "$work/repo"
+        cp -a "$source_dir/." "$work/repo/"
+        cd "$work/repo"
+        
+        validate() {
+          makepkg --force --nodeps
+          makepkg --printsrcinfo > .SRCINFO
+        }
+        if [ "$(id -u)" -eq 0 ]; then
+          id tiller-builder >/dev/null 2>&1 || useradd -m -s /bin/bash tiller-builder
+          chown -R tiller-builder "$work/repo"
+          export -f validate
+          runuser -u tiller-builder -- bash -c 'cd "$1" && validate' -- "$work/repo"
+          chown -R root "$work/repo"
+        else
+          validate
+        fi
+        
+        git config user.name "${TILLER_AUR_USERNAME:?username is required}"
+        git config user.email "${TILLER_AUR_EMAIL:-actions@github.com}"
+        git checkout -B master
+        # Build outputs and downloaded sources must never be added to the AUR repository.
+        while IFS= read -r -d '' file; do
+          git add -- "${file#"$source_dir/"}"
+        done < <(find "$source_dir" -type f -print0)
+        git add .SRCINFO
+        if git diff --cached --quiet; then
+          echo 'Tiller: AUR package is already current'
+          exit 0
+        fi
+        git commit -m "${TILLER_AUR_MESSAGE:?commit-message is required}"
+        git push origin master
